@@ -161,50 +161,92 @@ const initContactForm = () => {
             }
             
             // Get form data
-            const name = this.querySelector('input[type="text"]').value;
-            const mobile = this.querySelector('input[type="tel"]').value;
-            const email = this.querySelector('input[type="email"]').value;
-            const category = this.querySelector('select').value;
-            const requirements = this.querySelector('textarea').value;
+            const inputs = this.querySelectorAll('input');
+            const textareas = this.querySelectorAll('textarea');
+            const select = this.querySelector('select');
+            
+            const formData = {
+                companyName: inputs[0].value,
+                country: inputs[1].value,
+                address: textareas[0].value,
+                gstin: inputs[2].value,
+                pinCode: inputs[3].value,
+                companyEmail: inputs[4].value,
+                contactPerson: inputs[5].value,
+                owner: inputs[6].value,
+                companyHead: inputs[7].value,
+                companyHeadEmail: inputs[8].value,
+                companyHeadContact: inputs[9].value,
+                technicalHead: inputs[10].value,
+                technicalHeadContact: inputs[11].value,
+                technicalHeadEmail: inputs[12].value,
+                commercialHead: inputs[13].value,
+                commercialHeadContact: inputs[14].value,
+                commercialHeadEmail: inputs[15].value,
+                category: select.value,
+                requirements: textareas[1].value
+            };
             
             // Simple validation
-            if (!name || !mobile || !email || !category || !requirements) {
+            const requiredFields = Object.values(formData);
+            if (requiredFields.some(field => !field || field.trim() === '')) {
                 alert('Please fill in all required fields.');
                 return;
             }
             
             // Email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Please enter a valid email address.');
+            const emails = [formData.companyEmail, formData.companyHeadEmail, formData.technicalHeadEmail, formData.commercialHeadEmail];
+            if (emails.some(email => !emailRegex.test(email))) {
+                alert('Please enter valid email addresses.');
                 return;
             }
             
             // Phone validation (basic)
             const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/;
-            if (!phoneRegex.test(mobile)) {
-                alert('Please enter a valid mobile number.');
+            const phones = [formData.companyHeadContact, formData.technicalHeadContact, formData.commercialHeadContact];
+            if (phones.some(phone => !phoneRegex.test(phone))) {
+                alert('Please enter valid contact numbers.');
                 return;
             }
             
             // Create WhatsApp message
-            const whatsappMessage = `Hello Shree Balaji Enterprises,
+            const whatsappMessage = `Hello Shree Balaji Enterprises (SBE),
 
-I am interested in your products and would like to get a quote.
+We are interested in your premium products and would like to discuss business partnership.
 
-*Contact Details:*
-Name: ${name}
-Mobile: ${mobile}
-Email: ${email}
+*COMPANY DETAILS:*
+Company/Firm: ${formData.companyName}
+Country: ${formData.country}
+Address: ${formData.address}
+GSTIN: ${formData.gstin}
+Pin Code: ${formData.pinCode}
+Company Email: ${formData.companyEmail}
 
-*Product Category:* ${category}
+*KEY CONTACTS:*
+Contact Person: ${formData.contactPerson}
+Owner: ${formData.owner}
 
-*Requirements:*
-${requirements}
+Company Head: ${formData.companyHead}
+Company Head Email: ${formData.companyHeadEmail}
+Company Head Contact: ${formData.companyHeadContact}
 
-Please provide me with more information and pricing.
+Technical Head: ${formData.technicalHead}
+Technical Head Contact: ${formData.technicalHeadContact}
+Technical Head Email: ${formData.technicalHeadEmail}
 
-Thank you!`;
+Commercial/Purchase Head: ${formData.commercialHead}
+Commercial Head Contact: ${formData.commercialHeadContact}
+Commercial Head Email: ${formData.commercialHeadEmail}
+
+*PRODUCT INTEREST:* ${formData.category}
+
+*DETAILED REQUIREMENTS:*
+${formData.requirements}
+
+Please provide technical specifications, pricing, and commercial terms.
+
+Thank you for your time.`;
             
             // Open WhatsApp with pre-filled message
             const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(whatsappMessage)}`;
@@ -315,12 +357,12 @@ const initButtonHandlers = () => {
                         const productValue = productName.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '');
                         // Map product names to select values
                         const productMapping = {
-                            'ms-pallets': 'pallets',
-                            'rubber-grommets': 'rubber-plastic',
-                            'ss-trolleys': 'trolleys',
-                            'spiral-ducts': 'ducting',
-                            'spindle-buttons': 'springs',
-                            'machine-parts': 'modification'
+                            'silent-chain': 'silent-chain',
+                            'spindle-buttons': 'spindle-buttons',
+                            'ss-trolleys-for-ycp': 'ss-trolleys',
+                            'separators-clips': 'separators',
+                            'ohtc-system': 'ohtc',
+                            'ms-trolleys': 'ms-trolleys'
                         };
                         
                         const mappedValue = productMapping[productValue] || 'other';
