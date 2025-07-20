@@ -167,89 +167,59 @@ const initContactForm = () => {
             
             const formData = {
                 companyName: inputs[0].value,
-                country: inputs[1].value,
                 address: textareas[0].value,
-                gstin: inputs[2].value,
-                pinCode: inputs[3].value,
-                companyEmail: inputs[4].value,
-                contactPerson: inputs[5].value,
-                owner: inputs[6].value,
-                companyHead: inputs[7].value,
-                companyHeadEmail: inputs[8].value,
-                companyHeadContact: inputs[9].value,
-                technicalHead: inputs[10].value,
-                technicalHeadContact: inputs[11].value,
-                technicalHeadEmail: inputs[12].value,
-                commercialHead: inputs[13].value,
-                commercialHeadContact: inputs[14].value,
-                commercialHeadEmail: inputs[15].value,
+                gstin: inputs[1].value,
+                pinCode: inputs[2].value,
+                companyEmail: inputs[3].value,
                 category: select.value,
                 requirements: textareas[1].value
             };
             
-            // Simple validation
-            const requiredFields = Object.values(formData);
-            if (requiredFields.some(field => !field || field.trim() === '')) {
-                alert('Please fill in all required fields.');
+            // Simple validation - only Company Name and Product Category required
+            if (!formData.companyName || formData.companyName.trim() === '') {
+                alert('Please enter Company/Firm Name.');
                 return;
             }
             
-            // Email validation
+            if (!formData.category || formData.category.trim() === '') {
+                alert('Please select a Product Category.');
+                return;
+            }
+            
+            // Special handling for Industrial Bearing - redirect to bharatbearing.com
+            if (formData.category === 'industrial-bearing') {
+                window.open('https://bharatbearing.com', '_blank');
+                this.reset();
+                alert('You are being redirected to Bharat Bearing website for Industrial Bearing inquiries.');
+                return;
+            }
+            
+            // Email validation (only if email is filled)
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const emails = [formData.companyEmail, formData.companyHeadEmail, formData.technicalHeadEmail, formData.commercialHeadEmail];
-            if (emails.some(email => !emailRegex.test(email))) {
-                alert('Please enter valid email addresses.');
+            if (formData.companyEmail && formData.companyEmail.trim() !== '' && !emailRegex.test(formData.companyEmail)) {
+                alert('Please enter a valid email address.');
                 return;
             }
             
-            // Phone validation (basic)
-            const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/;
-            const phones = [formData.companyHeadContact, formData.technicalHeadContact, formData.commercialHeadContact];
-            if (phones.some(phone => !phoneRegex.test(phone))) {
-                alert('Please enter valid contact numbers.');
-                return;
-            }
+            // Create WhatsApp message with only filled fields
+            const addFieldIfFilled = (label, value) => value && value.trim() !== '' ? `${label}: ${value}\n` : '';
             
-            // Create WhatsApp message
             const whatsappMessage = `Hello Shree Balaji Enterprises (SBE),
 
 We are interested in your premium products and would like to discuss business partnership.
 
 *COMPANY DETAILS:*
 Company/Firm: ${formData.companyName}
-Country: ${formData.country}
-Address: ${formData.address}
-GSTIN: ${formData.gstin}
-Pin Code: ${formData.pinCode}
-Company Email: ${formData.companyEmail}
-
-*KEY CONTACTS:*
-Contact Person: ${formData.contactPerson}
-Owner: ${formData.owner}
-
-Company Head: ${formData.companyHead}
-Company Head Email: ${formData.companyHeadEmail}
-Company Head Contact: ${formData.companyHeadContact}
-
-Technical Head: ${formData.technicalHead}
-Technical Head Contact: ${formData.technicalHeadContact}
-Technical Head Email: ${formData.technicalHeadEmail}
-
-Commercial/Purchase Head: ${formData.commercialHead}
-Commercial Head Contact: ${formData.commercialHeadContact}
-Commercial Head Email: ${formData.commercialHeadEmail}
-
+${addFieldIfFilled('Address', formData.address)}${addFieldIfFilled('GSTIN', formData.gstin)}${addFieldIfFilled('Pin Code', formData.pinCode)}${addFieldIfFilled('Company Email', formData.companyEmail)}
 *PRODUCT INTEREST:* ${formData.category}
 
-*DETAILED REQUIREMENTS:*
-${formData.requirements}
-
+${addFieldIfFilled('*DETAILED REQUIREMENTS:*', formData.requirements)}
 Please provide technical specifications, pricing, and commercial terms.
 
 Thank you for your time.`;
             
             // Open WhatsApp with pre-filled message
-            const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(whatsappMessage)}`;
+            const whatsappUrl = `https://wa.me/917357371032?text=${encodeURIComponent(whatsappMessage)}`;
             window.open(whatsappUrl, '_blank');
             
             // Reset form and show success message
@@ -357,12 +327,15 @@ const initButtonHandlers = () => {
                         const productValue = productName.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '');
                         // Map product names to select values
                         const productMapping = {
-                            'silent-chain': 'silent-chain',
-                            'spindle-buttons': 'spindle-buttons',
+                            'bobbin-transport-system-(bts)': 'bobbin-transport-system',
+                            'separator-clips': 'separator-clips',
+                            'bobbin-trolleys': 'bobbin-trolleys',
+                            'separators': 'separators',
+                            'gear-cutters': 'gear-cutters',
                             'ss-trolleys-for-ycp': 'ss-trolleys',
-                            'separators-clips': 'separators',
-                            'ohtc-system': 'ohtc',
-                            'ms-trolleys': 'ms-trolleys'
+                            'spindle-buttons': 'spindle-buttons',
+                            'silent-chain': 'silent-chain',
+                            'industrial-bearing': 'industrial-bearing'
                         };
                         
                         const mappedValue = productMapping[productValue] || 'other';
@@ -580,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavbarScroll();
     initScrollAnimations();
     initCounterAnimation();
-    initLazyLoading();
+    initImageHandling();
     initHeaderAutoHide();
     
     // Add loading complete class for any CSS transitions
@@ -616,7 +589,7 @@ const initWhatsAppButton = () => {
     whatsappFloat.innerHTML = '<i class="fab fa-whatsapp"></i>';
     whatsappFloat.className = 'whatsapp-float';
     whatsappFloat.onclick = () => {
-        window.open('https://wa.me/919876543210?text=Hello! I am interested in your industrial parts and would like to get more information.', '_blank');
+        window.open('https://wa.me/917357371032?text=Hello! I am interested in your industrial parts and would like to get more information.', '_blank');
     };
     
     // Add styles for floating button
@@ -663,5 +636,4 @@ const initWhatsAppButton = () => {
 };
 
 // Initialize WhatsApp floating button
-// Uncomment the line below if you want a floating WhatsApp button
-// initWhatsAppButton();
+initWhatsAppButton();
